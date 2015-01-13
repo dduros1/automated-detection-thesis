@@ -48,13 +48,13 @@ static std::map<int, int> counts;
 
 
 // This function is called before every instruction is executed
-VOID docount(ADDRINT insCategory) { 
+VOID docount(ADDRINT insCode) { 
     //icount++; 
-    if (counts.find(insCategory) == counts.end()){
+    if (counts.find(insCode) == counts.end()){
 	//not found: add to map, need to initialize to 1 not 0 as is done automatically
-	counts[insCategory] = 1;
+	counts[insCode] = 1;
     } else{
-	counts[insCategory]++;
+	counts[insCode]++;
     }
 }
     
@@ -62,12 +62,12 @@ VOID docount(ADDRINT insCategory) {
 VOID Instruction(INS ins, VOID *v)
 {
     //OutFile << CATEGORY_StringShort(INS_Category(ins)) << endl;
-    // Insert a call to docount before every instruction, argument is the instruction category number
-    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_ADDRINT, (INS_Category(ins)), IARG_END);
+    // Insert a call to docount before every instruction, argument is the instruction opcode
+    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_ADDRINT, (INS_Opcode(ins)), IARG_END);
 }
 
 KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool",
-    "o", "categorycount.out", "specify output file name");
+    "o", "instrtypecount.out", "specify output file name");
 
 // This function is called when the application exits
 VOID Fini(INT32 code, VOID *v)
@@ -77,7 +77,7 @@ VOID Fini(INT32 code, VOID *v)
     //OutFile << "Count " << icount << endl;
 
     for (std::map<int, int>::const_iterator iter = counts.begin(); iter != counts.end(); ++iter){
-	OutFile << iter->first << '\t' << CATEGORY_StringShort(iter->first) << '\t'<< iter->second <<endl;
+	OutFile << iter->first << '\t' << OPCODE_StringShort(iter->first) << '\t'<< iter->second <<endl;
     }
 
     OutFile.close();

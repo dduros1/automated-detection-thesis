@@ -10,7 +10,7 @@ do
     do
         for k in "${compiler[@]}"
         do
-            $k -Wall -Wextra -$i -$j -ggdb -o binaries/aestest\_$k\_$i\_$j aestest.c -lcrypto &>compile_results.txt
+            $k -Wall -Wextra -$i -$j -ggdb -o ../binaries/aestest\_$k\_$i\_$j openssl_aes.c -lcrypto &>compile_results.txt
         done
     done
 done
