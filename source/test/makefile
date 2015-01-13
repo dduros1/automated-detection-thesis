@@ -1,8 +1,11 @@
 CC = gcc
 CFLAGS = -Wall
 OBJECTS=aes arcfour blowfish des md2 md5 rot-13 sha1
+OBJECTPATH=../../binaries/test/crypto/
 
-all: $(OBJECTS)
+.PHONY: all move clean
+
+all: $(OBJECTS) move
 
 clean:
 	rm -rf $(OBJECTS)
@@ -30,3 +33,6 @@ rot-13: rot-13_test.c rot-13.c
 
 sha1: sha1_test.c sha1.c
 	$(CC) $(CFLAGS) -o sha1 sha1_test.c sha1.c
+
+move:           
+	$(MV) $(OBJECTs) $(OBJECT_PATH)

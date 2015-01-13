@@ -3,12 +3,13 @@ import subprocess
 import argparse
 import os
 
-pindir = '/home/d/Documents/shiny-thesis/pin'
+thesisdir = '/home/d/Documents/shiny-thesis'
+pindir = thesisdir+'/pin'
 looptool = pindir+'/source/tools/MyPinTool/obj-intel64/simpleloop.so'
 categorytool = pindir+'/source/tools/MyPinTool/obj-intel64/categorycount.so'
 instructiontool = pindir+'/source/tools/MyPinTool/obj-intel64/arithinscount.so'
 pin = pindir+'/pin.sh'
-fileDirectory = './featurefiles/'
+fileDirectory = thesisdir+'/features/featurefiles/'
 debug = False
 
 def processDirectory(dirName):
@@ -19,6 +20,10 @@ def processDirectory(dirName):
 	return
 
 def processFile(fileName, filePath):
+	if fileName == None:
+		fileName = filePath.split('/')[-1]
+
+	print 'processing', fileName, '...'
 	loopfeatures = countLoops(filePath)
 	instrfeatures = countInstructions(filePath)
 	categoryfeatures = countCategories(filePath)
@@ -52,6 +57,7 @@ def countCategories(currFile):
 			if int(eles[0]) <= 60:
 				categories[int(eles[0])] = eles[2]
 
+	print 'category features extracted'
 	return categories
 
 #TODO i think that everything is index one, soooo index 0 shouldn't be included
@@ -72,6 +78,7 @@ def countInstructions(currFile):
 			eles = line.split('\t')
 			if int(eles[0]) <= 1133:
 				instructions[int(eles[0])] = eles[1]
+	print 'Instruction features extracted'	
 	return instructions
 
 def countLoops(currFile):
@@ -99,6 +106,7 @@ def countLoops(currFile):
 			f.write(str(item[1])+'\t' + str(item[2])+'\n')
 		f.close()
 	
+	print 'Loop features extracted'
 	return parseLoopFeature(keep)
 
 def parseLoopFeature(keep):
@@ -111,7 +119,6 @@ def parseLoopFeature(keep):
 			features[loopidx(cmd)] += int(count)
 		except IndexError:
 			continue		#not a feature we're keeping
-	print features
 	return features
 			
 
@@ -145,7 +152,7 @@ def main():
 	elif (args.d != None):
 		processDirectory(args.d)
 	elif (args.f != None):
-		processFile(args.f)
+		processFile(None, args.f)
 	
 
 main()

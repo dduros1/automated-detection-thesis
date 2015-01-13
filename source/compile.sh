@@ -14,7 +14,7 @@ do
             for k in "${compiler[@]}"
             do
                 echo $alg
-$k -Wall -Wextra -$i -$j -ggdb -o ../binaries/$alg-test\_$k\_$i\_$j openssl\_$alg.c -lcrypto &>compile_results.txt
+$k -Wall -Wextra -$i -$j -ggdb -o ../binaries/crypto/$alg-test\_$k\_$i\_$j crypto/openssl\_$alg.c -lcrypto &>compile_results_crypto.txt
             done
         done
     done
