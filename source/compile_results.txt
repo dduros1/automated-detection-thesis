@@ -1,1 +1,53 @@
-cc1: error: argument to '-O' should be a non-negative integer
+openssl_rc4.c: In function ‘main’:
+openssl_rc4.c:15:23: warning: initializer-string for array of chars is too long [enabled by default]
+  char plaintext[64] = "this is a string encrypted with openssl rc4. it is 64 bytes long.";
+                       ^
+openssl_rc4.c:17:19: warning: initializer-string for array of chars is too long [enabled by default]
+  char mykey[16] = "this is a bad password";
+                   ^
+openssl_rc4.c:20:2: warning: pointer targets in passing argument 3 of ‘RC4_set_key’ differ in signedness [-Wpointer-sign]
+  RC4_set_key(&rc4_key, 16, mykey); /* the key is 128 bits or 16 bytes long */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:81:6: note: expected ‘const unsigned char *’ but argument is of type ‘char *’
+ void RC4_set_key(RC4_KEY *key, int len, const unsigned char *data);
+      ^
+openssl_rc4.c:21:2: warning: pointer targets in passing argument 3 of ‘RC4’ differ in signedness [-Wpointer-sign]
+  RC4(&rc4_key, 12, plaintext, ciphertext); /* plaintext is 12 bytes long */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:83:6: note: expected ‘const unsigned char *’ but argument is of type ‘char *’
+ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
+      ^
+openssl_rc4.c:21:2: warning: pointer targets in passing argument 4 of ‘RC4’ differ in signedness [-Wpointer-sign]
+  RC4(&rc4_key, 12, plaintext, ciphertext); /* plaintext is 12 bytes long */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:83:6: note: expected ‘unsigned char *’ but argument is of type ‘char *’
+ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
+      ^
+openssl_rc4.c:26:2: warning: pointer targets in passing argument 3 of ‘RC4_set_key’ differ in signedness [-Wpointer-sign]
+  RC4_set_key(&rc4_key, 16, mykey); /* reset the key stream */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:81:6: note: expected ‘const unsigned char *’ but argument is of type ‘char *’
+ void RC4_set_key(RC4_KEY *key, int len, const unsigned char *data);
+      ^
+openssl_rc4.c:27:2: warning: pointer targets in passing argument 3 of ‘RC4’ differ in signedness [-Wpointer-sign]
+  RC4(&rc4_key, 12, ciphertext, plaintext); /* start decryption */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:83:6: note: expected ‘const unsigned char *’ but argument is of type ‘char *’
+ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
+      ^
+openssl_rc4.c:27:2: warning: pointer targets in passing argument 4 of ‘RC4’ differ in signedness [-Wpointer-sign]
+  RC4(&rc4_key, 12, ciphertext, plaintext); /* start decryption */
+  ^
+In file included from openssl_rc4.c:11:0:
+/usr/include/openssl/rc4.h:83:6: note: expected ‘unsigned char *’ but argument is of type ‘char *’
+ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
+      ^
+openssl_rc4.c:29:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("Decrypted: %s\n", plaintext);
+  ^
+openssl_rc4.c:29:2: warning: incompatible implicit declaration of built-in function ‘printf’ [enabled by default]
