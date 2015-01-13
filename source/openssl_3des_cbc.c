@@ -3,6 +3,8 @@
  *
  *  Created on: Oct 18, 2014
  *      Author: d
+ *
+ *  All DES code created with the help of http://blog.fpmurphy.com/2010/04/openssl-des-api.html
  */
 
 #include <unistd.h>
@@ -39,21 +41,16 @@ int main(void)
     /* plaintext */
     strcpy(in, "this is a string encrypted with triple des. it is 64 bytes long.");
 
-    printf("Plaintext: [%s]\n", in);
 
     len = strlen(in);
     memcpy(ivec, ivsetup, sizeof(ivsetup));
     DES_ede3_cbc_encrypt(in, encrypted, len, &ks1, &ks2, &ks3, &ivec, DES_ENCRYPT);
 
-    printf("Ciphertext:");
-    while (*e) printf(" [%02x]", *e++);
-    printf("\n");
-
     len = strlen(encrypted);
     memcpy(ivec, ivsetup, sizeof(ivsetup));
     DES_ede3_cbc_encrypt(encrypted, decrypted, len, &ks1, &ks2, &ks3, &ivec, DES_DECRYPT);
 
-    printf("Decrypted Text: [%s]\n", decrypted);
+    printf("Decrypted Text: %s\n", decrypted);
 
     exit(0);
 
