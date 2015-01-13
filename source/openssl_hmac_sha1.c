@@ -10,6 +10,7 @@ int main() {
 
     unsigned char* result;
     unsigned int len = strlen(plaintext);
+    int i;
 
     result = (unsigned char*)malloc(sizeof(char) * len);
 
@@ -23,7 +24,7 @@ int main() {
 
     printf("Hashed string: ");
 
-    for (int i = 0; i != len; i++)
+    for (i = 0; i != len; i++)
         printf("%02x", (unsigned int)result[i]);
 
     printf("\n");
