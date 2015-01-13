@@ -1,0 +1,10 @@
+Keep the sum of loops over an instruction in array index
+
+0	push qword ptr
+1	jmp qword ptr
+2	repne scasb byte ptr
+3	add
+4	lea
+5	not
+6	and
+7	jz
