@@ -43,13 +43,13 @@ ofstream OutFile;
 
 // The running count of instructions is kept here
 // make it static to help the compiler optimize docount
-//static UINT64 icount = 0;
+static UINT64 total = 0;
 static std::map<int, int> counts;
 
 
 // This function is called before every instruction is executed
 VOID docount(ADDRINT insCode) { 
-    //icount++; 
+    total++; 
     if (counts.find(insCode) == counts.end()){
 	//not found: add to map, need to initialize to 1 not 0 as is done automatically
 	counts[insCode] = 1;
@@ -77,7 +77,8 @@ VOID Fini(INT32 code, VOID *v)
     //OutFile << "Count " << icount << endl;
 
     for (std::map<int, int>::const_iterator iter = counts.begin(); iter != counts.end(); ++iter){
-	OutFile << iter->first << '\t' << OPCODE_StringShort(iter->first) << '\t'<< iter->second <<endl;
+        double proportion = ((double)iter->second)/total;
+        OutFile << iter->first << '\t' << OPCODE_StringShort(iter->first) << '\t'<< proportion << endl;//iter->second <<endl;
     }
 
     OutFile.close();

@@ -31,7 +31,7 @@ END_LEGAL */
 /* 
 Modified from ManualExamples/inscount0.cpp
 
-This tool counts the number of dynamically executed instructions per category
+This tool counts the proportion of dynamically executed instructions per category
 */
 
 #include <iostream>
@@ -43,7 +43,7 @@ ofstream OutFile;
 
 // The running count of instructions is kept here
 // make it static to help the compiler optimize docount
-//static UINT64 icount = 0;
+static UINT64 total = 0;
 static std::map<int, int> counts;
 
 
@@ -56,6 +56,7 @@ VOID docount(ADDRINT insCategory) {
     } else{
 	counts[insCategory]++;
     }
+    total++;
 }
     
 // Pin calls this function every time a new instruction is encountered
@@ -77,7 +78,8 @@ VOID Fini(INT32 code, VOID *v)
     //OutFile << "Count " << icount << endl;
 
     for (std::map<int, int>::const_iterator iter = counts.begin(); iter != counts.end(); ++iter){
-	OutFile << iter->first << '\t' << CATEGORY_StringShort(iter->first) << '\t'<< iter->second <<endl;
+        double proportion = (double(iter->second))/total;
+        OutFile << iter->first << '\t' << CATEGORY_StringShort(iter->first) << '\t'<< proportion << endl;//iter->second <<endl;
     }
 
     OutFile.close();

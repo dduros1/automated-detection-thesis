@@ -36,12 +36,12 @@ class SupervisedModel:
         Create instruction and category datasets
     '''
     def createDataset(self, dataDir, test):
-        for root, dirs, files in os.walk(self.dataDir):
+        for root, dirs, files in os.walk(dataDir):
             for fileName in files:
 
                 if 'cat.feature' in fileName and not self.mode:
                     l = self.label(fileName)
-                    feature = self.extractLines(self.dataDir+fileName)
+                    feature = self.extractLines(dataDir+fileName)
                     if test:
                         self.testData.append(feature)
                         self.testTarget.append(l)
@@ -50,7 +50,7 @@ class SupervisedModel:
                         self.trainTarget.append(l)
                 elif 'ins.feature' in fileName and self.mode:
                     l = self.label(fileName)
-                    feature = self.extractLines(self.dataDir+fileName)
+                    feature = self.extractLines(dataDir+fileName)
                     if test:
                         self.testData.append(feature)
                         self.testTarget.append(l)
@@ -81,10 +81,34 @@ class SupervisedModel:
     '''
     def trainModel(self):
         if (self.algorithm == 'svm'):
-            self.svmtrain(filePrefix)
+            self.svmtrain()
         elif self.algorithm=='ann':
-            self.anntrain(filePrefix)
+            self.anntrain()
 
+
+    def crossValidate(self):
+        from sklearn import cross_validation
+
+        svc = svm.SVC(C=1, kernel='linear')
+        kfold = cross_validation.KFold(len(self.trainTarget), n_folds=3)
+#        for train, test in kfold:
+#           print 'TRAIN:', train
+#           print 'TEST:', test
+
+#       blah = [svc.fit(self.trainData[train], self.trainTarget[train]).score(self.trainData[test], self.trainTarget[test]) for train, test in kfold]
+
+#       print blah
+
+        blah = cross_validation.cross_val_score(svc, self.trainData, self.trainTarget, cv=kfold, n_jobs=-1)
+        print blah
+
+    def testModel(self):
+        pass
+
+
+
+    def evaluateModel(self):
+        pass
     '''
         Load saved models
     '''
@@ -99,6 +123,7 @@ class SupervisedModel:
         self.mySVM = svm.SVC()
         self.mySVM.fit(self.trainData, self.trainTarget)
 
+        print self.mySVM.support_vectors_
 
     def saveModel(self, filePrefix):
         if filePrefix == None:
@@ -176,6 +201,7 @@ class TypeModel(SupervisedModel):
 
 
 import argparse
+import sys
 
 def main():
     parser = argparse.ArgumentParser(description='Create a supervised model')
@@ -188,11 +214,12 @@ def main():
     parser.add_argument('-ins', action='store_true', default=False, help='Indicate instruction features, defaults tocategory')
     
     args = parser.parse_args()
-    
-    if args.load == None and (args.test == None or args.train == None):
-        print 'Please provide saved model files to load or testing and training data to create a model'
-    if args.load != None and args.test == None:
-        print 'Please provide both saved model file and testing data'
+
+
+#if args.load == None and (args.test == None or args.train == None):
+#       print 'Please provide saved model files to load or testing and training data to create a model'
+#   if args.load != None and args.test == None:
+#       print 'Please provide both saved model file and testing data'
 
     #ML model we are using
     model = args.model
@@ -201,6 +228,12 @@ def main():
     
     #Feature mode--for evaluation purposes (assume instruction mode)
     m = SupervisedModel(model, args.ins)
+
+    #do cross validation to see how we're doing
+    m.setTrainData(args.train)
+    m.crossValidate()
+
+    sys.exit()
 
     if (args.load != None):
         m.setTestData(args.test)
