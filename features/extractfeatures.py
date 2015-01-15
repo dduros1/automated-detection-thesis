@@ -31,8 +31,13 @@ def processFile(fileName, filePath):
 
 #print instrfeatures
 
-    ifile = open(fileDirectory+'ins/'+fileName+'_ins.feature', 'w+')
-    cfile = open(fileDirectory+'cat/'+fileName+'_cat.feature', 'w+')
+    if test:
+        outputdir = fileDirectory+'test/'
+    else:
+        outputdir = fileDirectory+'train/'
+
+    ifile = open(outputdir+'ins/'+fileName+'_ins.feature', 'w+')
+    cfile = open(outputdir+'cat/'+fileName+'_cat.feature', 'w+')
 	
     for feat in instrfeatures:
         ifile.write(str(feat).rstrip()+'\n')
@@ -141,18 +146,25 @@ def loopidx(x):
 def main():
     global debug
     global fileDirectory
+    global test
 
 	#setup arguments
     parser = argparse.ArgumentParser(description='Feature Extraction using Pin')
     parser.add_argument('-o', type=str, help='Output directory for feature files')
     parser.add_argument('-d', type=str, help='A directory containing files to process')
     parser.add_argument('-f', type=str, help='A file to process')
-    parser.add_argument('-debug', action='store_true')
+    parser.add_argument('-test', action='store_true', default=False, help='Indicates that we are generating features for the test set')
+    parser.add_argument('-debug', action='store_true', default=False)
     args = parser.parse_args()
 
-    if (args.debug):
-        debug = True
+#    if (args.debug):
+#       debug = True
 
+#   if args.test:
+#       test = True
+
+    debug = args.debug
+    test = args.test
     if (args.o != None):
         fileDirectory=args.o
 
