@@ -10,31 +10,53 @@ from sklearn import svm
     This class defines a SupervisedModel
 '''
 class SupervisedModel:
-    featurefiles = '/home/d/Documents/shiny-thesis/features/featurefiles/crypto/' 
+#featurefiles = '/home/d/Documents/shiny-thesis/features/featurefiles/crypto/' 
     cryptoalgs = ['aes', '3des', 'rsa', 'rc4', 'sha1', 'md5']
     modeldir = '/home/d/Documents/shiny-thesis/models/savedModels/'
 
     '''
         Initialize the model with the desired classification algorithm
     '''
-    def __init__(self, mlAlgorithm):
-        self.categoryData = SupervisedDataSet(69,1)
-        self.instructionData = SupervisedDataSet(1142,1)
+    def __init__(self, mlAlgorithm, mode):
+        self.trainData = []
+        self.trainTarget = []
+        self.testData = []
+        self.testTarget = []
         self.algorithm = mlAlgorithm
+        self.mode = mode                #True: ins
+                                        #False: cat
+
+    def setTrainData(self, train):
+        self.createDataset(train, False)
+
+    def setTestData(self, test):
+        self.createDataset(test, True)
 
     '''
         Create instruction and category datasets
     '''
-    def createDatasets(self):
-        for root, dirs, files in os.walk(self.featurefiles):
+    def createDataset(self, dataDir, test):
+        for root, dirs, files in os.walk(self.dataDir):
             for fileName in files:
-                l = self.label(fileName)
-                feature = self.extractLines(self.featurefiles+fileName)
-                if 'cat.feature' in fileName:
-                    self.categoryData.addSample(feature, l)
-                elif 'ins.feature' in fileName:
-                    self.instructionData.addSample(feature, l)
 
+                if 'cat.feature' in fileName and not self.mode:
+                    l = self.label(fileName)
+                    feature = self.extractLines(self.dataDir+fileName)
+                    if test:
+                        self.testData.append(feature)
+                        self.testTarget.append(l)
+                    else:
+                        self.trainData.append(feature)
+                        self.trainTarget.append(l)
+                elif 'ins.feature' in fileName and self.mode:
+                    l = self.label(fileName)
+                    feature = self.extractLines(self.dataDir+fileName)
+                    if test:
+                        self.testData.append(feature)
+                        self.testTarget.append(l)
+                    else:
+                        self.trainData.append(feature)
+                        self.trainTarget.append(l)
 
     '''
         Generate labeled data from filename based on model type
@@ -57,16 +79,7 @@ class SupervisedModel:
     '''
         Train the model
     '''
-    def trainModel(self, *args):
-        if  args == None:
-            filePrefix = 'algorithmModel'
-        elif len(args) == 1:
-            filePrefix = args
-        elif len(args) == 2:
-            self.loadSavedModels(args[0], args[1])
-
-
-        self.createDatasets()
+    def trainModel(self):
         if (self.algorithm == 'svm'):
             self.svmtrain(filePrefix)
         elif self.algorithm=='ann':
@@ -75,23 +88,27 @@ class SupervisedModel:
     '''
         Load saved models
     '''
-    def loadSavedModels(self, modelFile1, modelFile2):
-        svm1 = SVMUnit(modelFile1)
-        svm2 = SVMUnit(modelFile2)
+    def loadSavedModel(self, modelFile1):
+        self.mySVM = joblib.load(modelFile)
 
     '''
         Train an svm on the data
     '''
-    def svmtrain(self, filePrefix):
-        catSVM = SVMUnit()
-        insSVM = SVMUnit()
+    def svmtrain(self):
 
-        cTrainer = SVMTrainer(catSVM, categoryData)
-        iTrainer = SVMTrainer(insSVM, instructionData)
+        self.mySVM = svm.SVC()
+        self.mySVM.fit(self.trainData, self.trainTarget)
 
-        #save model
-        catSVM.saveModel(self.modeldir+filePrefix+'_cat.model')
-        insSVM.loadModel(self.modeldir+filePrefix+'ins.model')
+
+    def saveModel(self, filePrefix):
+        if filePrefix == None:
+            filePrefix == self.getModelName()
+        if self.mode:
+            filePrefix += '_ins'
+        else:
+            filePrefix += '_cat'
+
+        joblib.dump(self.mySVM, self.modeldir+filePrefix+'.model')   
 
 
     '''
@@ -100,6 +117,11 @@ class SupervisedModel:
     def anntrain(self):
         pass
 
+
+
+    def getModelName(self):
+        return 'SupervisedModel'
+
 ############################## End SupervisedModel Class ###############################
 '''
     This model classifies algorithms individually
@@ -107,7 +129,11 @@ class SupervisedModel:
 '''
 class AlgorithmModel(SupervisedModel):
     def label(self,fileName):
-        return super(AlgorithmModel,self).label(fileName)
+        for alg in self.cryptoalgs:
+            if alg in fileName:
+                return alg
+    def getModelName(self):
+        return 'AlgorithmModel'
 
 
 ############################## End AlgorithmModel Class ###############################
@@ -125,6 +151,9 @@ class CryptoModel(SupervisedModel):
             num = 0
         return num
 
+    def getModelName(self):
+        return 'CryptoModel'
+
 
 ############################## End CryptoModel Class ###############################
 '''
@@ -140,6 +169,8 @@ class TypeModel(SupervisedModel):
             num = 0
         return num
 
+    def getModelName(self):
+        return 'TypeModel'
 
 ############################## End TypeModel Class ###############################
 
@@ -149,19 +180,37 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description='Create a supervised model')
     parser.add_argument('model',type=str, help='Options: svm (support vector machine) or ann (artificial neural net)',default='svm')
-    parser.add_argument('-s', nargs=2, type=str, help='Provide saved model files')
+    parser.add_argument('-test', type=str, help='Directory containing feature files for testing')
+    parser.add_argument('-train', type=str, help='Directory containing feature files for training')
+    parser.add_argument('-load', type=str, help='Provide saved model file to load')
     parser.add_argument('-o', type=str, help='Provide prefix for output model files')
+    parser.add_argument('-save', action='store_true', default=False, help='Save trained models')
+    parser.add_argument('-ins', action='store_true', default=False, help='Indicate instruction features, defaults tocategory')
+    
     args = parser.parse_args()
     
+    if args.load == None and (args.test == None or args.train == None):
+        print 'Please provide saved model files to load or testing and training data to create a model'
+    if args.load != None and args.test == None:
+        print 'Please provide both saved model file and testing data'
+
+    #ML model we are using
     model = args.model
     if (model not in ['svm', 'ann']):
         model = 'svm'
-    m = SupervisedModel(model)
+    
+    #Feature mode--for evaluation purposes (assume instruction mode)
+    m = SupervisedModel(model, args.ins)
 
-    if (args.s != None and len(args.s) == 2):
-        m.trainModel(args.s[1], args.s[2])
+    if (args.load != None):
+        m.setTestData(args.test)
+        m.loadModel(args.load)
     else:
-        m.trainModel(args.o)
+        m.setTrainData(args.train)
+        m.setTestData(args.test)
+        m.trainModel()
+        if args.save:
+            m.saveModel(args.o)
 
 
 main()
