@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os
 import pickle
@@ -41,22 +41,24 @@ class SupervisedModel:
 
                 if 'cat.feature' in fileName and not self.mode:
                     l = self.label(fileName)
-                    feature = self.extractLines(dataDir+fileName)
-                    if test:
-                        self.testData.append(feature)
-                        self.testTarget.append(l)
-                    else:
-                        self.trainData.append(feature)
-                        self.trainTarget.append(l)
+                    if l != None:
+                        feature = self.extractLines(dataDir+fileName)
+                        if test:
+                            self.testData.append(feature)
+                            self.testTarget.append(l)
+                        else:
+                            self.trainData.append(feature)
+                            self.trainTarget.append(l)
                 elif 'ins.feature' in fileName and self.mode:
                     l = self.label(fileName)
-                    feature = self.extractLines(dataDir+fileName)
-                    if test:
-                        self.testData.append(feature)
-                        self.testTarget.append(l)
-                    else:
-                        self.trainData.append(feature)
-                        self.trainTarget.append(l)
+                    if l != None:
+                        feature = self.extractLines(dataDir+fileName)
+                        if test:
+                            self.testData.append(feature)
+                            self.testTarget.append(l)
+                        else:
+                            self.trainData.append(feature)
+                            self.trainTarget.append(l)
 
     '''
         Generate labeled data from filename based on model type
@@ -86,29 +88,40 @@ class SupervisedModel:
             self.anntrain()
 
 
-    def crossValidate(self):
+    def crossValidate(self, k):
         from sklearn import cross_validation
 
+        #TODO play with params
         svc = svm.SVC(C=1, kernel='linear')
-        kfold = cross_validation.KFold(len(self.trainTarget), n_folds=3)
-#        for train, test in kfold:
-#           print 'TRAIN:', train
-#           print 'TEST:', test
+        kfold = cross_validation.KFold(len(self.trainTarget), n_folds=k)
 
-#       blah = [svc.fit(self.trainData[train], self.trainTarget[train]).score(self.trainData[test], self.trainTarget[test]) for train, test in kfold]
+        cv = cross_validation.cross_val_score(svc, self.trainData, self.trainTarget, cv=kfold, n_jobs=-1)
+        print(cv)
 
-#       print blah
 
-        blah = cross_validation.cross_val_score(svc, self.trainData, self.trainTarget, cv=kfold, n_jobs=-1)
-        print blah
+    '''
 
+    '''
     def testModel(self):
-        pass
+        predicted = []
+        for instance in self.testData:
+            predicted.append(self.mySVM.predict(instance)[0])
+        self.evaluateModel(predicted)
+        
+
+    '''
+        This method prints out a number of classification metrics
+    '''
+    def evaluateModel(self, predTarget):
+        from sklearn.metrics import classification_report, accuracy_score
+        print('Classification Report')
+        target_names = self.getTargetNames()
+        
+        print (classification_report(self.testTarget, predTarget, target_names=self.cryptoalgs))
+        print ('Accuracy_score')
+        print (accuracy_score(self.testTarget, predTarget))
 
 
-
-    def evaluateModel(self):
-        pass
     '''
         Load saved models
     '''
@@ -123,7 +136,6 @@ class SupervisedModel:
         self.mySVM = svm.SVC()
         self.mySVM.fit(self.trainData, self.trainTarget)
 
-        print self.mySVM.support_vectors_
 
     def saveModel(self, filePrefix):
         if filePrefix == None:
@@ -154,11 +166,16 @@ class SupervisedModel:
 '''
 class AlgorithmModel(SupervisedModel):
     def label(self,fileName):
-        for alg in self.cryptoalgs:
-            if alg in fileName:
-                return alg
+        num = super(AlgorithmModel, self).label(fileName)
+        if num >= 0:
+            return num
+        else:
+            return None         #don't train on non crypto
     def getModelName(self):
         return 'AlgorithmModel'
+
+    def getTargetNames(self):
+        return self.cryptoalgs
 
 
 ############################## End AlgorithmModel Class ###############################
@@ -179,6 +196,9 @@ class CryptoModel(SupervisedModel):
     def getModelName(self):
         return 'CryptoModel'
 
+    def getTargetNames(self):
+        return ['Not crypto', 'Crypto']
+
 
 ############################## End CryptoModel Class ###############################
 '''
@@ -192,10 +212,15 @@ class TypeModel(SupervisedModel):
             num = 1
         elif num > -1 and num < 4:
             num = 0
+        else:
+            num = None      #don't use non crypto
         return num
 
     def getModelName(self):
         return 'TypeModel'
+
+    def getTargetNames(self):
+        return ['Crypto', 'Hash']
 
 ############################## End TypeModel Class ###############################
 
@@ -203,7 +228,31 @@ class TypeModel(SupervisedModel):
 import argparse
 import sys
 
+
+def runExperiment(m, k):
+    global args
+
+    #do cross validation to see how we're doing
+    if (args.train != None):
+        print ('Cross validation on training set (kfold = %d)' % k)
+        m.setTrainData(args.train)
+        m.crossValidate(k)
+
+
+    if (args.load != None):
+        m.setTestData(args.test)
+        m.loadModel(args.load)
+    else:
+        m.setTrainData(args.train)
+        m.setTestData(args.test)
+        m.trainModel()
+        if args.save:
+            m.saveModel(args.o)
+        m.testModel()
+
 def main():
+    global args
+
     parser = argparse.ArgumentParser(description='Create a supervised model')
     parser.add_argument('model',type=str, help='Options: svm (support vector machine) or ann (artificial neural net)',default='svm')
     parser.add_argument('-test', type=str, help='Directory containing feature files for testing')
@@ -216,34 +265,31 @@ def main():
     args = parser.parse_args()
 
 
-#if args.load == None and (args.test == None or args.train == None):
-#       print 'Please provide saved model files to load or testing and training data to create a model'
-#   if args.load != None and args.test == None:
-#       print 'Please provide both saved model file and testing data'
+    if args.load == None and args.test == None and args.train == None:
+        print('Please provide saved model files to load or testing and training data to create a model')
+        sys.exit()
+    if args.load != None and args.test == None:
+        print('Please provide both saved model file and testing data')
+        sys.exit()
 
     #ML model we are using
     model = args.model
     if (model not in ['svm', 'ann']):
         model = 'svm'
     
-    #Feature mode--for evaluation purposes (assume instruction mode)
-    m = SupervisedModel(model, args.ins)
 
-    #do cross validation to see how we're doing
-    m.setTrainData(args.train)
-    m.crossValidate()
+    ####MODEL 1: algorithm vs algorithm
+    #Feature mode--for evaluation purposes (assume category mode)
+    print('Algorithm Model')
+    m = AlgorithmModel(model, args.ins)
+    runExperiment(m, 3)
 
-    sys.exit()
+    print('Crypto Model')
+    m = CryptoModel(model, args.ins)
+    runExperiment(m,3)
 
-    if (args.load != None):
-        m.setTestData(args.test)
-        m.loadModel(args.load)
-    else:
-        m.setTrainData(args.train)
-        m.setTestData(args.test)
-        m.trainModel()
-        if args.save:
-            m.saveModel(args.o)
-
+    print('Type Model')
+    m = TypeModel(model, args.ins)
+    runExperiment(m,3)
 
 main()
