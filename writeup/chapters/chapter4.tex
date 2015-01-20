@@ -1,0 +1,67 @@
+\chapter{Machine Learning}
+
+\section{Models}
+
+I created three types of models:
+\begin{enumerate}
+	\item Detection model
+	\item Type classification model
+	\item Algorithm classification model
+\end{enumerate}
+
+The first model classifies examples as having crypto versus not having crypto.  The second determines if the crypto present is encryption or hashing, and the third tries to classify it as a particular algorithm.  For evaluation, I implemented each model under all four learning algorithms detailed below.
+
+\section{Framework}
+
+To perform machine learning on extracted features, I utilized the scikit-learn\cite{scikit-learn} package for Python.
+
+\section{Supervised Learning}
+\subsection{Support Vector Machine (SVM)}
+A linear SVM for binary classification processes labeled training data in order to define a hyperplane that separates the two classes.  While there are many hyperplanes that could separate the data, the best is accepted to be the hyperplane that creates the largest separation between the two classes, or the maximum margin.  This requires the assumption that the data is linearly separable.
+
+In order to properly represent possibly nonlinear data, we can use a linear SVM with a kernel.  We transform the data $x$ with some basis function $\phi(x)$, and the basis function can project the data into higher dimensional space, where it will be separable.  This allows nonlinear classification in a parametric linear framework.
+
+The detection and type classification models are both binary classification problems, while the algorithm classification model is a multi-class problem.  For this, I use scikit-learn's SVC class, which implements a one-versus-one model\cite{knerr}, and results in $n (n-1)/2$ binary classifiers for $n$ classes.
+
+\textbf{Put some math in to show kernel methods}
+
+\textbf{Talk about specific kernel used}
+
+\subsection{Naive Bayes}
+In Naive Bayes, we assume that all features are conditionally independent from each other.  Despite this strong assumption, in practice, naive Bayes classifiers work very well, particularly in document classification problems.
+
+Due to this, I considered my features to be similar to those in a text document, where data is either represented as word vector counts or tf-idf features (term frequency and inverse document frequency).  In my case, I can consider the number of times an instruction was executed to be equivalent to a word count.
+
+\textbf{Implement NB as multinomial, do counts--pretend this is a text classification problem}
+
+To determine a classification, the model picks the class that maximizes the probability that a testing instance $x_i$ belongs to class $C_k$
+
+\begin{equation}
+\hat{y} = argmax_{k\in\{1\ldots K\}} p(C_k) \prod_{i=1}^n p(x_i \mid C_k) \label{naivebayes}
+\end{equation}
+
+
+\subsection{Decision Tree}
+As opposed to \textbf{ Gaussain/Multinomial} Naive Bayes and SVMs, a decision tree implements non-parametric learning.  Instead of training some parameters, the model learns decision rules from the training features.
+
+Each internal node is a decision rule, and the leaf nodes are classes.  By filtering a feature pattern through the tests, the model reaches a classification decision.
+
+
+
+
+\section{Unsupervised Learning}
+\subsection{K-means Clustering}
+Given a predefined value $k$, this algorithm partitions the data into $k$ clusters without the use of labels by minimizing the within-cluster sum of squares:
+
+\begin{equation}
+argmin_C \sum_{i=1}^k \sum_{x\in C_i} \mid \mid  x-\mu_i \mid \mid ^2\label{kmeans}
+\end{equation}
+
+Given a predefined value $k$, this algorithm creates $k$ clusters of data without relying on labels.  To evaluate the accuracy of this method, we can compare the clustered data to the labeled data and see if instances were clustered appropriately.
+
+
+Since I have a strongly defined dataset, I could easily choose my $k$-value for the number of clusters to form.  For the first two models, I have a binary classification problem, so I need $k=2$.  For the third model, I am only training on \textbf{5?} algorithms, so $k=5$.
+
+Scikit-learn uses Lloyd's algorithm\cite{lloyd} to solve the k-means problem.
+
+

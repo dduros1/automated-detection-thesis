@@ -1,0 +1,46 @@
+\chapter{Feature Extraction}
+
+\section{Data}
+To generate data, I created small programs using open source code with the sole function of implementing certain cryptographic algorithms: RC4, SHA1, MD5, RSA, AES, 3DES.  I used the OpenSSL implementation for each algorithm.  For encryption algorithms, the programs implemented encryption and decryption.  For the hashing algorithms, I created two programs: one that simply called the hash function and one that called HMAC implemented with the specific function.
+
+In order to generate enough training data, I then compiled each small program with different compiler flags \textbf{and compilers?}.  This resulted in \textbf{how many} binary files.
+
+
+\section{PIN framework}
+The first task in applying machine learning to this problem is to identify and extract features.  \textbf{Cite here} noted that cryptographic algorithms have uncommonly high counts of bitwise arithmetic instructions and loop executions.  I used Intel's PIN instrumentation framework \textbf{Cite} to generate these features.  I generated three types of features: instruction, category, and loop.
+
+\subsection{Instruction features}
+\textbf{Need to test count of instruction vs proportion--I think proportion will be better if I use basic blocks}
+
+This feature set is a vector of length 1133, where each value in the vector corresponds to the proportion of each individual instruction to the total number of instructions.  The index is given by the opcode output by PIN.
+
+\subsection{Category features}
+
+PIN classifies instructions into categories, such as NOP, SYSCALL, BINARY, STRINGOP.  Each category is indicated by an id, and the ids produced by my training examples ranged from 1 to 60.  Since cryptographic algorithms have disproportionately high counts of arithmetic instructions, the goal for this feature set was to capture this at a higher level than examining individual instruction counts.
+
+
+\subsection{Loop features}
+I utilized \textbf{cite} open source PinTool to detect loops using the instruction counter, and record the number of times the loop is executed.  Initial testing showed that there were only 8 instructions that were repeatedly looped over in the crypto examples:
+\begin{enumerate}
+	\item push qword ptr [addr]
+	\item jmp qword ptr [addr]
+	\item repne scasb byte ptr [reg]
+	\item add x, y
+	\item lea x, y
+	\item not x
+	\item and x, y
+	\item jz addr	
+\end{enumerate}
+
+To create features, I summed the number of times each was called in a loop, resulting in a vector of length 8.
+
+\textbf{see if you have time to implement the other loop features!}
+
+\section{Feature extraction results}
+To compare the granularity of instruction-based features versus the higher level category features, I extracted two sets of features.  The first is a vector of length 1142 that encapsulates 1138 instructions and 8 loop counts.  The second is a vector of length 69 that encapsulates 60 categories and 8 loop counts.  For simplicity, and to maintain consistency with PIN's ids, the zero index of both the category and instruction vectors holds the value 0.
+
+\begin{itemize}
+	\item Talk about processing time
+	\item Talk about processing failures
+\end{itemize}
+

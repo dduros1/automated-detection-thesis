@@ -1,0 +1,74 @@
+\chapter{Experimental Evaluation}
+All experiments were run on an Ubuntu virtual machine with 1 processor core and 1024 MB of memory.
+
+
+\section{Timing Analysis}
+\subsection{Feature Extraction}
+The average time to process features is slightly over 3 seconds.  I evaluated the feature extraction processing on 149 training files.
+
+\begin{center}
+\begin{table}
+\begin{tabular}{c|cc}
+\textbf{Feature type} & \textbf{Average processing time (seconds)} & \textbf{Total failures}\\
+\hline
+Instruction & 1.1677 & 0\\
+Category & 1.1131 & 0\\
+Loop & 1.1739 & 70
+\end{tabular}
+\label{featureprocessing}
+\caption{Summary of processing failures and timing analysis for feature extraction}
+\end{table}
+\end{center}
+
+
+\subsection{Model Training}
+
+
+\section{Experimental Results}
+\subsection{Feature Extraction}
+
+\subsection{Model 1: Cryptographic detection binary classifier}
+\begin{center}
+\begin{table}[H]
+\begin{tabular}{c|cc}
+\textbf{Algorithm} & \textbf{measure1} & \textbf{measure2}\\
+\hline
+SVM & 0 & 0\\
+Naive Bayes & 0 & 0\\
+Decision Tree & 0 & 0\\
+K-means & 0 & 0 \\
+\end{tabular}
+\caption{Summary of classifier/clustering results for a model that classifies a binary program as containing crypto or not}\label{model1}
+\end{table}
+\end{center}
+
+\subsection{Model 2: Cryptographic algorithm type binary classifier}
+\begin{center}
+\begin{table}
+\begin{tabular}{c|cc}
+\textbf{Algorithm} & \textbf{measure1} & \textbf{measure2}\\
+\hline
+SVM & 0 & 0\\
+Naive Bayes & 0 & 0\\
+Decision Tree & 0 & 0\\
+K-means & 0 & 0 \\
+\end{tabular}
+\caption{Summary of classifier/clustering results for a model that classifies a binary program that contains crypto as having encryption or hashing}\label{model2}
+\end{table}
+\end{center}
+
+\subsection{Model 3: Cryptographc algorithm multiclass classifier}
+\begin{center}
+\begin{table}
+\begin{tabular}{c|cc}
+\textbf{Algorithm} & \textbf{measure1} & \textbf{measure2}\\
+\hline
+SVM & 0 & 0\\
+Naive Bayes & 0 & 0\\
+Decision Tree & 0 & 0\\
+K-means & 0 & 0 \\
+\end{tabular}
+\caption{Summary of classifier/clustering results for a model that classifies a binary program that contains crypto as belonging to one of 5 pre-specified algorithms}\label{model3}
+\end{table}
+\end{center}
+
