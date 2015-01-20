@@ -1,6 +1,6 @@
 #!/bin/bash
 
-algorithms=(\3des\_cbc \3des\_ofb \3des\_cfb aes hmac\_md5 hmac\_sha1 md5 rsa sha1 rc4)
+algorithms=(md5 \3des\_cbc \3des\_ofb \3des\_cfb aes hmac\_md5 hmac\_sha1 rsa sha1 rc4)
 compiler=(gcc) # clang)
 pos_ind=(fpic fno-pic)
 opt=(O O0 O1 O2 O3 Os Ofast Og)
@@ -14,7 +14,7 @@ do
             for k in "${compiler[@]}"
             do
                 echo $alg
-$k -Wall -Wextra -$i -$j -ggdb -o ../binaries/crypto/$alg-test\_$k\_$i\_$j crypto/openssl\_$alg.c -lcrypto &>compile_results_crypto.txt
+                $k -Wall -Wextra -$i -$j -ggdb -o ../binaries/train/$alg-test\_$k\_$i\_$j crypto/openssl\_$alg.c -lcrypto &>compile_results_crypto.txt
             done
         done
     done
