@@ -3,16 +3,14 @@
 \section{Data}
 To generate data, I created small programs using open source code with the sole function of implementing certain cryptographic algorithms: RC4, SHA1, MD5, RSA, AES, 3DES.  I used the OpenSSL implementation for each algorithm.  For encryption algorithms, the programs implemented encryption and decryption.  For the hashing algorithms, I created two programs: one that simply called the hash function and one that called HMAC implemented with the specific function.
 
-In order to generate enough training data, I then compiled each small program with different compiler flags \textbf{and compilers?}.  This resulted in \textbf{how many} binary files.
+In order to generate enough training data, I then compiled each small program with different compiler flags and compilers (gcc and clang), along with some programs that did not contain crypto.  This resulted in 317 binary files.
 
 
 \section{PIN framework}
-The first task in applying machine learning to this problem is to identify and extract features.  \textbf{Cite here} noted that cryptographic algorithms have uncommonly high counts of bitwise arithmetic instructions and loop executions.  I used Intel's PIN instrumentation framework \textbf{Cite} to generate these features.  I generated three types of features: instruction, category, and loop.
+The first task in applying machine learning to this problem is to identify and extract features.  Grobert, et al. \cite{grobert} noted that cryptographic algorithms have uncommonly high counts of bitwise arithmetic instructions and loop executions.  I used Intel's PIN instrumentation framework \cite{pin} to generate these features.  I generated three types of features: instruction, category, and loop.  For the instruction and category features, I created models that used the proportion of each feature to the total number of instructions in the program, as well as the raw count.
 
 \subsection{Instruction features}
-\textbf{Need to test count of instruction vs proportion--I think proportion will be better if I use basic blocks}
-
-This feature set is a vector of length 1133, where each value in the vector corresponds to the proportion of each individual instruction to the total number of instructions.  The index is given by the opcode output by PIN.
+This feature set is a vector of length 1133, where each value in the vector corresponds to either the count or the proportion of each individual instruction to the total number of instructions.  The index is given by the opcode output by PIN.
 
 \subsection{Category features}
 

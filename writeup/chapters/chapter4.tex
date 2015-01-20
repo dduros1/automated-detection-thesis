@@ -17,22 +17,47 @@ To perform machine learning on extracted features, I utilized the scikit-learn\c
 
 \section{Supervised Learning}
 \subsection{Support Vector Machine (SVM)}
-A linear SVM for binary classification processes labeled training data in order to define a hyperplane that separates the two classes.  While there are many hyperplanes that could separate the data, the best is accepted to be the hyperplane that creates the largest separation between the two classes, or the maximum margin.  This requires the assumption that the data is linearly separable.
+A linear SVM for binary classification processes labeled training data in order to define a hyperplane that separates the two classes.  While there are many hyperplanes that could separate the data, the best is accepted to be the hyperplane that creates the largest separation between the two classes, or the maximum margin.  This requires the assumption that the data is linearly separable.  Once the SVM is trained, the model stores a weight vector $\lambda$ such that the hyperplane is $y = \lambda x$.  Each SVM I used has the intercept at 0 \textbf{check this!}.
 
-In order to properly represent possibly nonlinear data, we can use a linear SVM with a kernel.  We transform the data $x$ with some basis function $\phi(x)$, and the basis function can project the data into higher dimensional space, where it will be separable.  This allows nonlinear classification in a parametric linear framework.
+The classifiers will take the form
+\begin{equation}
+	\hat{y} = \sum_{i=1}^n \lambda_i K(x, x_i) \label{svm}
+\end{equation}
+
+In order to properly represent possibly nonlinear data, we can use a linear SVM with a kernel function, $K(x, x')$.  We transform the data $x$ with some basis function $\phi(x)$, and the basis function can project the data into higher dimensional space, where it will be separable.  This allows nonlinear classification in a parametric linear framework.
 
 The detection and type classification models are both binary classification problems, while the algorithm classification model is a multi-class problem.  For this, I use scikit-learn's SVC class, which implements a one-versus-one model\cite{knerr}, and results in $n (n-1)/2$ binary classifiers for $n$ classes.
 
-\textbf{Put some math in to show kernel methods}
-
-\textbf{Talk about specific kernel used}
+\subsection{Kernels}
+Scikit-learn supports 4 different kernel functions: radial-basis function (RBF), linear, polynomial, sigmoid.  I used the default parameters, so it is likely there could be significant improvement given parameter tweaking.
+ 
+ %reference: http://crsouza.blogspot.com/2010/03/kernel-functions-for-machine-learning.html
+\begin{description}
+	\item[RBF]: This is a Gaussian kernel.  Given two samples $x, y$
+		$$ K(x, y) = \exp \left( -\frac{\mid \mid x-y \mid \mid^2}{2\sigma^2} \right) $$
+	\item[Linear]: This is the simplest kernel function
+		$$ K(x, y) = x^Ty + c $$
+	\item[Polynomial]: The default degree for this kernel is 3.  Given two samples $x, y$,
+		$$ K(x, y) = (\alpha x^Ty +c)^d $$ %large degrees tend to overfit
+	\item[Sigmoid]: This kernel originated from the neural networks field, and performs well in practice
+		$$ K(x, y)= \tanh(\alpha x^T y +c) $$
+\end{description}
 
 \subsection{Naive Bayes}
-In Naive Bayes, we assume that all features are conditionally independent from each other.  Despite this strong assumption, in practice, naive Bayes classifiers work very well, particularly in document classification problems.
+In a naive Bayes model, we assume that all features are conditionally independent from each other.  Despite this strong assumption, in practice, naive Bayes classifiers work very well, particularly in document classification problems.
 
-Due to this, I considered my features to be similar to those in a text document, where data is either represented as word vector counts or tf-idf features (term frequency and inverse document frequency).  In my case, I can consider the number of times an instruction was executed to be equivalent to a word count.
+I evaluated two types of naive Bayes classifiers: gaussian and multinomial.  The gaussian implementation assumes that the continuous values follow a gaussian distribution, and given the mean and variance of the feature vectors in each class $c$, we compute the probability distribution of a feature vector given a class.
 
-\textbf{Implement NB as multinomial, do counts--pretend this is a text classification problem}
+\begin{equation}
+	p(x= v \mid c) = \frac{1}{\sqrt{2\pi\sigma_c^c}}e^{-\frac{(v-\mu_c)^2}{2\sigma_c^2}}\label{gaussianbayes}
+\end{equation}
+
+The multinomial model is often used in document classification.  I considered my features to be similar to those in a text document, where data is either represented as word vector counts or tf-idf features (term frequency and inverse document frequency).  In my case, I considered the number of times an instruction was executed to be equivalent to a word count.  Despite this, multinomial naive Bayes performed significantly worse than Gaussian.  The likelihood of observing a feature vector $x$ in class $C_k$,
+
+\begin{equation}
+	p(x \mid C_k ) = \frac{(\sum_i x_i)!}{\prod_i x_i !}\prod_i p_{ki}^{x_i}
+	\label{multinomialbayes}
+\end{equation}
 
 To determine a classification, the model picks the class that maximizes the probability that a testing instance $x_i$ belongs to class $C_k$
 
@@ -42,7 +67,7 @@ To determine a classification, the model picks the class that maximizes the prob
 
 
 \subsection{Decision Tree}
-As opposed to \textbf{ Gaussain/Multinomial} Naive Bayes and SVMs, a decision tree implements non-parametric learning.  Instead of training some parameters, the model learns decision rules from the training features.
+As opposed to naive Bayes and SVMs, a decision tree implements non-parametric learning.  Instead of training some parameters, the model learns decision rules from the training features.
 
 Each internal node is a decision rule, and the leaf nodes are classes.  By filtering a feature pattern through the tests, the model reaches a classification decision.
 
