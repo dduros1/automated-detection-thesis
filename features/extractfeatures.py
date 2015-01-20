@@ -2,6 +2,7 @@
 import subprocess
 import argparse
 import os
+import time
 
 thesisdir = '/home/d/Documents/shiny-thesis'
 pindir = thesisdir+'/pin'
@@ -11,7 +12,13 @@ instructiontool = pindir+'/source/tools/MyPinTool/obj-intel64/arithinscount.so'
 pin = pindir+'/pin.sh'
 fileDirectory = thesisdir+'/features/featurefiles/'
 debug = False
-
+catTime = 0
+insTime = 0
+loopTime = 0
+totalFiles = 0
+catErr = 0
+insErr = 0
+loopErr = 0
 
 def processDirectory(dirName):
 	for root, dirs, files in os.walk(dirName):
@@ -21,13 +28,27 @@ def processDirectory(dirName):
 	return
 
 def processFile(fileName, filePath):
+    global totalFiles, loopTime, catTime, insTime
+
+    totalFiles += 1
     if fileName == None:
         fileName = filePath.split('/')[-1]
 
     print 'processing', fileName, '...'
+    startTime = time.time()
     loopfeatures = countLoops(filePath)
+    endTime = time.time()
+    loopTime += endTime - startTime
+
+    startTime = time.time()
     instrfeatures = countInstructions(filePath)
+    endTime = time.time()
+    insTime += endTime - startTime
+    
+    startTime = time.time()
     categoryfeatures = countCategories(filePath)
+    endTime = time.time()
+    catTime += endTime - startTime
 
 #print instrfeatures
 
@@ -49,6 +70,8 @@ def processFile(fileName, filePath):
 
 
 def countCategories(currFile):
+    global catErr
+
     categories = [0]*61
 
     command = [pin, '-t', categorytool, '--', currFile]
@@ -56,6 +79,7 @@ def countCategories(currFile):
         subprocess.call(command)
     except Exception:
         print 'Error in processing categories for', currFile
+        catErr += 1
         return categories
 
 	#writes to categorycount.out file, need to open and process file
@@ -71,12 +95,14 @@ def countCategories(currFile):
 #TODO i think that everything is index one, soooo index 0 shouldn't be included
 #TODO change if statements to exception handling
 def countInstructions(currFile):
+    global insErr
     instructions = [0]*1134
 
     command = [pin, '-t', instructiontool, '--', currFile]
     try:
         subprocess.call(command)
     except Exception:
+        insErr +=1
         print 'Error in processing instructions for', currFile
         return instructions
 
@@ -91,10 +117,13 @@ def countInstructions(currFile):
     return instructions
 
 def countLoops(currFile):
+    global loopErr
+
     command = [pin, '-t', looptool, '--', currFile]
     try:
         output = subprocess.check_output(command)
     except Exception:
+        loopErr +=1
         print 'Error in processing loops for', currFile
         return [0]*8
 
@@ -177,3 +206,14 @@ def main():
 	
 
 main()
+
+print 'Feature extraction is complete--------------------------'
+print 'Average time to process instructions', insTime/totalFiles
+print 'Average time to process categories', catTime/totalFiles
+print 'Average time to process loops', loopTime/totalFiles
+print '------------------------------------'
+print 'Failures to process instructions %d/%d' % (insErr, totalFiles)
+print 'Failures to process categories %d/%d' % (catErr, totalFiles)
+print 'Failures to process loops %d/%d' % (loopErr, totalFiles)
+
+
