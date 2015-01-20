@@ -75,7 +75,11 @@ Date:\\
 \abstract{
 \addtocontents{toc}{\vspace{1em}}  % Add a gap in the Contents, for aesthetics
 
-The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+	When analyzing a binary program, we are interested in identifying which algorithms are used in the program.  This is especially important when analyzing malicious software (malware), which often uses cryptographic algorithms.  By detecting and identifying this algorithms automatically, we can make program analysis quicker and easier.
+	
+In this thesis, I will present several methods of leveraging machine learning to automatically discover an classify cryptography in compiled binary programs.  
+
+\textbf{Then I need to summarize my results}
 
 }
 
@@ -112,35 +116,35 @@ The acknowledgements and the people to thank go here, don't forget to include yo
 %% ----------------------------------------------------------------
 \setstretch{1.5}  % Set the line spacing to 1.5, this makes the following tables easier to read
 \clearpage  % Start a new page
-\lhead{\emph{Abbreviations}}  % Set the left side page header to "Abbreviations"
-\listofsymbols{ll}  % Include a list of Abbreviations (a table of two columns)
-{
+%\lhead{\emph{Abbreviations}}  % Set the left side page header to "Abbreviations"
+%\listofsymbols{ll}  % Include a list of Abbreviations (a table of two columns)
+%{
 % \textbf{Acronym} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or \\
-\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere \\
+%\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere \\
 
-}
+%}
 
 %% ----------------------------------------------------------------
-\clearpage  % Start a new page
-\lhead{\emph{Physical Constants}}  % Set the left side page header to "Physical Constants"
-\listofconstants{lrcl}  % Include a list of Physical Constants (a four column table)
-{
+%\clearpage  % Start a new page
+%\lhead{\emph{Physical Constants}}  % Set the left side page header to "Physical Constants"
+%\listofconstants{lrcl}  % Include a list of Physical Constants (a four column table)
+%{
 % Constant Name & Symbol & = & Constant Value (with units) \\
-Speed of Light & $c$ & $=$ & $2.997\ 924\ 58\times10^{8}\ \mbox{ms}^{-\mbox{s}}$ (exact)\\
+%Speed of Light & $c$ & $=$ & $2.997\ 924\ 58\times10^{8}\ \mbox{ms}^{-\mbox{s}}$ (exact)\\
 
-}
+%}
 
 %% ----------------------------------------------------------------
-\clearpage  %Start a new page
-\lhead{\emph{Symbols}}  % Set the left side page header to "Symbols"
-\listofnomenclature{lll}  % Include a list of Symbols (a three column table)
-{
+%\clearpage  %Start a new page
+%\lhead{\emph{Symbols}}  % Set the left side page header to "Symbols"
+%\listofnomenclature{lll}  % Include a list of Symbols (a three column table)
+%{
 % symbol & name & unit \\
-$a$ & distance & m \\
-$P$ & power & W (Js$^{-1}$) \\
-& & \\ % Gap to separate the Roman symbols from the Greek
-$\omega$ & angular frequency & rads$^{-1}$ \\
-}
+%$a$ & distance & m \\
+%$P$ & power & W (Js$^{-1}$) \\
+%& & \\ % Gap to separate the Roman symbols from the Greek
+%$\omega$ & angular frequency & rads$^{-1}$ \\
+%}
 %% ----------------------------------------------------------------
 % End of the pre-able, contents and lists of things
 % Begin the Dedication page
@@ -160,19 +164,27 @@ $\omega$ & angular frequency & rads$^{-1}$ \\
 % Include the chapters of the thesis, as separate files
 % Just uncomment the lines as you write the chapters
 
+\lhead{\emph{Introduction}}
 \input{Chapters/Chapter1} % Introduction
 
-%\input{Chapters/Chapter2} % Background Theory 
+\lhead{\emph{Related Work}}
+\input{Chapters/Chapter2} % Background Theory 
 
-%\input{Chapters/Chapter3} % Experimental Setup
+\lhead{\emph{Feature Extraction}}
+\input{Chapters/Chapter3} % Experimental Setup
 
-%\input{Chapters/Chapter4} % Experiment 1
 
-%\input{Chapters/Chapter5} % Experiment 2
+\lhead{\emph{Machine Learning}}
+\input{Chapters/Chapter4} % Experiment 1
 
-%\input{Chapters/Chapter6} % Results and Discussion
+\lhead{\emph{Experimental Evaluation}}
+\input{Chapters/Chapter5} % Experiment 2
 
-%\input{Chapters/Chapter7} % Conclusion
+\lhead{\emph{Limitations}}
+\input{Chapters/Chapter6} % Results and Discussion
+
+\lhead{\emph{Conclusion}}
+\input{Chapters/Chapter7} % Conclusion
 
 %% ----------------------------------------------------------------
 % Now begin the Appendices, including them as separate files
@@ -193,8 +205,8 @@ $\omega$ & angular frequency & rads$^{-1}$ \\
 %% ----------------------------------------------------------------
 \label{Bibliography}
 \lhead{\emph{Bibliography}}  % Change the left side page header to "Bibliography"
-\bibliographystyle{unsrtnat}  % Use the "unsrtnat" BibTeX style for formatting the Bibliography
-\bibliography{Bibliography}  % The references (bibliography) information are stored in the file named "Bibliography.bib"
+\bibliographystyle{plain}  % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+\bibliography{bibliography}  % The references (bibliography) information are stored in the file named "bibliography.bib"
 
 \end{document}  % The End
 %% ----------------------------------------------------------------
