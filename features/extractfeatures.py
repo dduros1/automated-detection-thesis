@@ -122,9 +122,11 @@ def countLoops(currFile):
     command = [pin, '-t', looptool, '--', currFile]
     try:
         output = subprocess.check_output(command)
-    except Exception:
+    except Exception, e:
         loopErr +=1
         print 'Error in processing loops for', currFile
+        with open ('looperrors.out', 'a+') as out:
+            out.write(str(e))
         return [0]*8
 
     output = output.split('\n')
