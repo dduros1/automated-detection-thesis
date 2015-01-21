@@ -1,5 +1,22 @@
 \chapter{Limitations}
 
+This method relies on dynamic analysis using Pin for feature extraction.  If the code of interest is not executed during instrumentation, then it will not be analyzed and extracted.  Therefore, we must assume that the cryptographic code is always executed.  However, if malware can detect the presence of the Pin instrumentation code, it would be able to avoid executing this code and thus avoid detection. As mentioned in \cite{grobert}, using a more robust malware analysis framework for feature extraction could solve this.
+
+In this thesis, I have only addressed C/C++ compiled code.  If an attacker uses a language such as Python, analysis would become complicated.  However, once appropriate features are identified and extracted, it would not be difficult to train models to detect and classify crypto in Python binaries.
+
+
+\section{Model limitations}
+As discussed in the previous chapter, the results suggest that a decision tree is the best learning algorithm for the data.  However, decision trees easily overfit data, and can be sensitive to small changes in the data.  They also tend to work best on fewer classes, so if it were trained on more cryptographic algorithms, it is possible that the model would break down. 
+
+To improve this model, further work could involve using a boosted decision tree, which Kolter and Maloof concluded was the best classifier for their work\cite{kolter}.%http://stats.stackexchange.com/questions/1292/what-is-the-weak-side-of-decision-trees
+
+%A model that still gave good performance on these experiments, but will probably generalize well to more algorithms and more realistic data is the SVM with a linear kernel.  More fine-tuning of the parameters would prevent over-fitting. %http://stats.stackexchange.com/questions/24437/advantages-and-disadvantages-of-svm
+
+
 \section{Further Work}
--Basic blocks
--better loop features
+In order to evaluate this on real-world examples, we need to break test programs into basic blocks, then extract features from the basic blocks and run the models on those features.  This will extend this methodology to more general testing examples, and have the added benefit of identifying where in the program binary the crypto occurs, as well as finding multiple instances of it in a single binary.
+
+Additionally, I extracted very simple loop features.  Possible improvements could be made by using the loop detection algorithm from Tubella and Gonz\`alez \cite{tubella} or LoopProf from Moseley, et. al\cite{Moseley}.
+
+To increase the usefulness of these models, they should be trained on additional encryption and hashing algorithms, as well as examples from crypto libraries in addition to OpenSSL.  This should allow the models to detect a wider variety of crypto.
+

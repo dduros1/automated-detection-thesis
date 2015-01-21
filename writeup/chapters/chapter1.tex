@@ -1,7 +1,26 @@
 \chapter{Introduction}
 
--Cryptovirology: cryptolocker
 
-When analyzing a binary program, researches must manually identify the cryptographic algorithm.  By automating this, they will be able to complete this task more quickly, enabling a faster response to malware and other threats.
+Detection and prevention of malicious software (malware) is an evolving problem in the security field.  As researchers develop new techniques, malware authors improve their ability to evade detection.  One way they do this is by leveraging cryptovirology, where they use cryptography to disguise certain activities \cite{cryptovirology}.
 
-Previous work in this area relies on heuristics to identify cryptographic primitives in the binary
+Like any other class of malware, crypto viruses can take many forms, such as malware that logs user activity or installs malicious software.  Recently, ransomware, where an attacker holds a system captive and demands a ransom, has become prevalent.  Recent viruses, such as CryptoLocker, encrypt the user's files, then direct them to pay a ransom via Bitcoin.  These viruses rely heavily on cryptography for their attacks.
+
+CryptoLocker was discovered in September 2013, and by the time a solution was delivered to the public in August 2014, the virus had affected approximately 500,000 and extorted around \$3 million \cite{BBCcryptolocker}.  For encryption, CryptoLocker used the public key encryption scheme RSA with a 2048-bit key pair.  Once the ransom has been paid, the user should (but not always) receive the private key for decryption.  International law enforcement agencies disrupted the command-and-control servers and intercepted the database of private keys, which was made available to users in August 2014 \cite{ARScryptolocker}.  
+
+Since CryptoLocker, ransomware has become increasingly popular.  Other recent crypto viruses are:
+\begin{itemize}
+	\item CryptoWall: Andrea Allievi and Earl Carter from Cisco's Talos group analyzed CryptoWall 2.0.  It uses The Onion Router (TOR) to protect communication with the command and control channel and encrypts files using 2048-bit RSA \cite{cryptowall}.
+	\item TorrentLocker: iSIGHT Partners have analyzed this ransomware through a number of iterations.  It uses AES (Rijndael) encryption, with either 128,192, or 256-bit keys, and initially encrypted all files with the same key using Output Feedback (OFB) mode. After this disclosure, the authors modified it to use Cipher-Block Chaining (CBC) mode with different key streams \cite{torrentlocker}. 
+	\item Critroni/Onion: Kaspersky Lab's analyzed Onion and discovered that it compresses files then encrypts them using AES with the hash SHA256.  Decryption is only possibly by using Elliptic Curve Diffie-Hellman (ECDH) with a master-private key, stored on the authors' server.  All communication with this server is also protected by ECDH with a different set of keys via TOR \cite{onion}. 
+\end{itemize}
+
+Due to the prevalence of cryptographic primitives in malware, researchers are interested in efficiently reverse engineering program binaries to detect crypto.  This requires labor-intensive manual analysis of the binaries, which does not scale well to the number of emerging threats.  
+
+The goal of this thesis is to utilize machine learning to detect and classify cryptography in small (single purpose) programs.  This technique may then by extended to larger, real-world examples by isolating the basic blocks of a program, and applying it against each basic block.  Previous work in this area relies on heuristics.  Unlike heuristics, it is easy to update machine learning models as malware authors evolve their evasion capabilities, and they will be more robust to obfuscation attempts.  Instead of constantly tweaking a heuristic or threshold based on new malware samples, we can simply re-train the models with the new data, which will scale better as malware continues to proliferate.
+
+The primary contributions of this thesis are:
+\begin{itemize}
+	\item Providing a framework for generating machine learning models that detect and classify cryptographic algorithms in binary programs
+	\item Demonstrating that these models are successful when tested against single-purpose binary programs
+	\item Suggesting further work that will build upon the models presented and extend them to successfully detect and classify crypto in larger (multipurpose) binary programs.
+\end{itemize}

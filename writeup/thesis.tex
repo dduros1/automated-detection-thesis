@@ -12,6 +12,9 @@
 \usepackage{vector}  % Allows "\bvec{}" and "\buvec{}" for "blackboard" style bold vectors in maths
 %\hypersetup{urlcolor=blue, colorlinks=true}  % Colours hyperlinks in blue, but this can be distracting if there are many links.
 
+\usepackage{float}
+\restylefloat{table}
+
 %% ----------------------------------------------------------------
 \begin{document}
 \frontmatter      % Begin Roman style (i, ii, iii, iv...) page numbering
@@ -77,9 +80,9 @@ Date:\\
 
 	When analyzing a binary program, we are interested in identifying which algorithms are used in the program.  This is especially important when analyzing malicious software (malware), which often uses cryptographic algorithms.  By detecting and identifying this algorithms automatically, we can make program analysis quicker and easier.
 	
-In this thesis, I will present several methods of leveraging machine learning to automatically discover an classify cryptography in compiled binary programs.  
+In this thesis, I will present several methods of leveraging machine learning to automatically discover an classify cryptography in compiled binary programs.
 
-\textbf{Then I need to summarize my results}
+While further work is necessary to fully evaluate these methods on real-world binary programs, the results in this paper suggest that machine learning can be used successfully to detect and identify cryptographic primitives in compiled code.  Currently, these techniques successfully detect and classify cryptographic algorithms in small programs, and further work is proposed to apply them to real-world examples.
 
 }
 
@@ -106,8 +109,8 @@ The acknowledgements and the people to thank go here, don't forget to include yo
 \tableofcontents  % Write out the Table of Contents
 
 %% ----------------------------------------------------------------
-\lhead{\emph{List of Figures}}  % Set the left side page header to "List if Figures"
-\listoffigures  % Write out the List of Figures
+%\lhead{\emph{List of Figures}}  % Set the left side page header to "List if Figures"
+%\listoffigures  % Write out the List of Figures
 
 %% ----------------------------------------------------------------
 \lhead{\emph{List of Tables}}  % Set the left side page header to "List of Tables"

@@ -13,11 +13,11 @@ The first model classifies examples as having crypto versus not having crypto.  
 
 \section{Framework}
 
-To perform machine learning on extracted features, I utilized the scikit-learn\cite{scikit-learn} package for Python.
+To perform machine learning on extracted features, I utilized the scikit-learn \cite{scikit-learn} package for Python.
 
 \section{Supervised Learning}
 \subsection{Support Vector Machine (SVM)}
-A linear SVM for binary classification processes labeled training data in order to define a hyperplane that separates the two classes.  While there are many hyperplanes that could separate the data, the best is accepted to be the hyperplane that creates the largest separation between the two classes, or the maximum margin.  This requires the assumption that the data is linearly separable.  Once the SVM is trained, the model stores a weight vector $\lambda$ such that the hyperplane is $y = \lambda x$.  Each SVM I used has the intercept at 0 \textbf{check this!}.
+A linear SVM for binary classification processes labeled training data in order to define a hyperplane that separates the two classes.  While there are many hyperplanes that could separate the data, the best is accepted to be the hyperplane that creates the largest separation between the two classes, or the maximum margin.  This requires the assumption that the data is linearly separable.  Once the SVM is trained, the model stores a weight vector $\lambda$ such that the hyperplane is $y = \lambda x$.  
 
 The classifiers will take the form
 \begin{equation}
@@ -26,7 +26,7 @@ The classifiers will take the form
 
 In order to properly represent possibly nonlinear data, we can use a linear SVM with a kernel function, $K(x, x')$.  We transform the data $x$ with some basis function $\phi(x)$, and the basis function can project the data into higher dimensional space, where it will be separable.  This allows nonlinear classification in a parametric linear framework.
 
-The detection and type classification models are both binary classification problems, while the algorithm classification model is a multi-class problem.  For this, I use scikit-learn's SVC class, which implements a one-versus-one model\cite{knerr}, and results in $n (n-1)/2$ binary classifiers for $n$ classes.
+The detection and type classification models are both binary classification problems, while the algorithm classification model is a multi-class problem.  For this, I use scikit-learn's SVC class, which implements a one-versus-one model \cite{knerr}, and results in $n (n-1)/2$ binary classifiers for $n$ classes.
 
 \subsection{Kernels}
 Scikit-learn supports 4 different kernel functions: radial-basis function (RBF), linear, polynomial, sigmoid.  I used the default parameters, so it is likely there could be significant improvement given parameter tweaking.
@@ -87,6 +87,6 @@ Given a predefined value $k$, this algorithm creates $k$ clusters of data withou
 
 Since I have a strongly defined dataset, I could easily choose my $k$-value for the number of clusters to form.  For the first two models, I have a binary classification problem, so I need $k=2$.  For the third model, I am only training on \textbf{5?} algorithms, so $k=5$.
 
-Scikit-learn uses Lloyd's algorithm\cite{lloyd} to solve the k-means problem.
+Scikit-learn uses Lloyd's algorithm \cite{lloyd} to solve the k-means problem.
 
 

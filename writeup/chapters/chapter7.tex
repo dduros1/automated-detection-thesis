@@ -1,1 +1,7 @@
 \chapter{Conclusion}
+
+In this thesis, I have examined the process of extracting features and training machine learning models for the detection and classification of cryptographic algorithms in compiled code.  I evaluated three different types of models with four different feature sets using four different learning algorithms.  I determined that while the decision tree models perform the best on this data, due to certain limitations of decision trees, an SVM with a linear kernel will likely generalize better to real-world data.
+
+Cross-validation results suggest that algorithm classification and detection will be over 95\% accurate.  Furthermore, once this method has been implemented such that it examines the basic blocks of larger programs, it will be able to identify where in the binary program the crypto algorithm is executed, further simplifying the reverse engineer's task.
+
+Further work is required to fully test these models in real world applications.  However, this thesis shows that it will be possible to allow machine learning to automatically detect and classify cryptographic primitives in binary code, instead of setting arbitrary thresholds.

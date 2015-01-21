@@ -7,7 +7,7 @@ In order to generate enough training data, I then compiled each small program wi
 
 
 \section{PIN framework}
-The first task in applying machine learning to this problem is to identify and extract features.  Grobert, et al. \cite{grobert} noted that cryptographic algorithms have uncommonly high counts of bitwise arithmetic instructions and loop executions.  I used Intel's PIN instrumentation framework \cite{pin} to generate these features.  I generated three types of features: instruction, category, and loop.  For the instruction and category features, I created models that used the proportion of each feature to the total number of instructions in the program, as well as the raw count.
+The first task in applying machine learning to this problem is to identify and extract features.  Lutz \cite{lutz} noted that cryptographic algorithms have uncommonly high counts of bitwise arithmetic instructions and loop executions.  I used Intel's Pin instrumentation framework \cite{pin} to generate these features.  I generated three types of features: instruction, category, and loop.  For the instruction and category features, I created models that used the proportion of each feature to the total number of instructions in the program, as well as the raw count.
 
 \subsection{Instruction features}
 This feature set is a vector of length 1133, where each value in the vector corresponds to either the count or the proportion of each individual instruction to the total number of instructions.  The index is given by the opcode output by PIN.
@@ -18,7 +18,7 @@ PIN classifies instructions into categories, such as NOP, SYSCALL, BINARY, STRIN
 
 
 \subsection{Loop features}
-I utilized \textbf{cite} open source PinTool to detect loops using the instruction counter, and record the number of times the loop is executed.  Initial testing showed that there were only 8 instructions that were repeatedly looped over in the crypto examples:
+I utilized an open source Pin tool to detect loops using the instruction counter \cite{simpleloop}, and record the number of times the loop is executed.  Initial testing showed that there were only 8 instructions that were repeatedly looped over in the crypto examples:
 \begin{enumerate}
 	\item push qword ptr [addr]
 	\item jmp qword ptr [addr]
@@ -32,13 +32,23 @@ I utilized \textbf{cite} open source PinTool to detect loops using the instructi
 
 To create features, I summed the number of times each was called in a loop, resulting in a vector of length 8.
 
-\textbf{see if you have time to implement the other loop features!}
-
 \section{Feature extraction results}
-To compare the granularity of instruction-based features versus the higher level category features, I extracted two sets of features.  The first is a vector of length 1142 that encapsulates 1138 instructions and 8 loop counts.  The second is a vector of length 69 that encapsulates 60 categories and 8 loop counts.  For simplicity, and to maintain consistency with PIN's ids, the zero index of both the category and instruction vectors holds the value 0.
+To compare the granularity of instruction-based features versus the higher level category features, I extracted two sets of features.  The first is a vector of length 1142 that encapsulates 1138 instructions and 8 loop counts.  The second is a vector of length 69 that encapsulates 60 categories and 8 loop counts.  For simplicity, and to maintain consistency with Pin's ids, the zero index of both the category and instruction vectors holds the value 0.
 
-\begin{itemize}
-	\item Talk about processing time
-	\item Talk about processing failures
-\end{itemize}
+\subsection{Timing Analysis}
+Due to the small size of the training set as well as the sparse nature of the feature vectors, model training is fast (less than 1 second per model).  Feature extraction requires significantly more time.  The average time to process features is slightly over 3 seconds.  I evaluated the feature extraction processing on 169 training files.
+
+\begin{center}
+\begin{table}[H]
+\begin{tabular}{c|cc}
+\textbf{Feature type} & \textbf{Average processing time (seconds)} & \textbf{Total failures}\\
+\hline
+Instruction & 1.779 & 0\\
+Category & 1.444 & 0\\
+Loop & 1.654 & 59
+\end{tabular}
+\label{featureprocessing}
+\caption{Summary of processing failures and timing analysis for feature extraction}
+\end{table}
+\end{center}
 

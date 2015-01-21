@@ -1,1 +1,33 @@
 \chapter{Related Work}
+
+Much of the previous work in this area builds on the field of automated protocol reverse engineering [\cite{caballero:polyglot},\cite{lin},\cite{Wondracek}], where the application-level protocol is extracted without access to the specification itself.  Like the task of analyzing binary programs for cryptographic primitives, protocol reverse engineering is a time consuming manual task.  Most of the previous work has been in creating domain-specific heuristics, instead of applying general machine learning algorithms; however, machine learning has been used successfully to classify detect and classify malware.
+
+\section{Automated protocol reverse engineering}
+Previous work in this area has been split between static approaches and dynamic approaches.  Static tools rely on signatures to determine if a particular implementation of a cryptographic primitive is present in a binary sample.  One of the first papers to utilize a dynamic approach was Wang et al. \cite{wang} who used data lifetime analysis and dynamic binary instrumentation (DBI) to identify when message decryption and processing occur, and extract the decrypted message from memory.
+
+Caballero et al. refines this technique to automatically reverse engineer the MegaD malware\cite{caballero:dispatcher}, which uses a custom encryption protocol to evade detection, the authors identified a number of heuristics concerning loop detection and the ratio of bitwise arithmetic instructions.  In this case, they required 20 executions of a function that had a ratio of at least 55\% bitwise arithmetic instructions.
+
+Lutz \cite{lutz}, cited by Caballero et al., created a tool that automatically decrypts encrypted input received by malicious binaries, using dynamic analysis to extract features.  His approach searches through the features to discover the location of the decryption routine and the decrypted input in system memory.  He also noted the two features of cryptographic code that this thesis (and Cabellero et al.) relies upon:
+\begin{enumerate}
+	\item Cryptographic code uses a high ratio of bitwise arithmetic instructions
+	\item Cryptographic code contains loops (but they are an insufficient feature on their own)
+\end{enumerate}
+
+\section{Classifying malware with machine learning}
+Kolter and Maloof\cite{kolter} used machine learning to detect and classify malware executables.  They collected 1971 benign executable, 1651 malicious executables, and various virus loaders, worms, and Trojan horses, then converted each executable to hexadecimal.  For features, they extracted $n$-grams, and approached the classification task as a text classification problem.  They evaluated the performance of Support Vector Machines (SVMs), Naive Bayes, Decision Trees, and Boosted Classifiers, and determined that a boosted decision tree performed the best in both the detection and the classification task.
+
+\section{Detecting cryptographic primitives}
+
+Gr\"{o}bert et al. \cite{grobert} created three heuristics to detect cryptographic basic blocks: chains, mnemonic-const, and verifier.  The chains heuristic is based on the sequence of instructions.  The authors compiled a database of known sequences generated from different open-source implementations, which they then compared to sequences found in an unknown sample.
+
+The mnemonic-const heuristic combines the chains heuristic with an examination of constants.  They noted that each algorithm contains unique tuples, which they consider characteristic for the algorithm.  They check for patterns using the chains heuristic, then intersect the results of that with the results of the characteristic tuples.
+
+The verifier heuristic confirms a relationship between the input and output of a permutation box using memory reconstruction.
+
+Like Caballero et al., Gr\"{o}bert et al use specific heuristics, with empirically determined thresholds to perform their detection classification.  
+
+The authors also focus on the importance of basic block detection for successful detection, where a basic block is a sequence of instructions in a given order that has a single entry and exit point.  These are generated from the dynamic trace.  Utilizing basic block detection is suggested as further work for this thesis.
+
+While Lutz, Lin et al., and Wang et al. utilized Valgrind to perform DBI, Gr\"{o}bert et al. used Intel's Pin\cite{pin} DBI.  As my work most directly relates to that of Gr\"{o}bert et al., I also used Pin.
+
+
