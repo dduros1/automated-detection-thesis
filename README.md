@@ -1,4 +1,4 @@
-# shiny-thesis
+# automated-detection-thesis
 
 Master's thesis: Automated detection and classification of cryptographic algorithms in binary code
 
